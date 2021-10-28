@@ -10,7 +10,7 @@ const app = express();
 // ----- Other Imports -----
 const mongoose = require('mongoose');       // to connect with MongoDB
 const logger = require('morgan');           // aides in development by logging http request to console
-// const cors = require('cors');               // will eanable cross-origin resource sharing
+const cors = require('cors');               // will eanable cross-origin resource sharing
 
 
 // =======================================
