@@ -2,8 +2,8 @@
 //              DEPENDENCIES
 // =======================================
 const express = require('express')
-const Transactions = require('../models/transaction')      // require relevant model
-const router = express.Router();                           // create router object
+const Transactions = require('../models/transaction')       // require relevant model
+const router = express.Router();                            // create router object
 
 // =======================================
 //              ROUTES
@@ -18,6 +18,9 @@ router.get('/', async (req, res) => {
     }
 })
 
+// TODO ----- DELETE Route -----
+// TODO ----- UPDATE ROUTE -----
+
 // ----- Create Route -----
 router.post('/', async (req, res) => {
     try {
@@ -31,4 +34,4 @@ router.post('/', async (req, res) => {
 // =======================================
 //         EXPORT ROUTER OBJECT
 // =======================================
-module.export = router
+module.exports = router

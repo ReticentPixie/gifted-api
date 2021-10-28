@@ -7,15 +7,18 @@ const { PORT = 3001, DATABASE_URL } = process.env      // destructured for ease;
 // ----- Import & Initialize Express -----
 const express = require('express')
 const app = express()
-// ----- Other Imports -----
+// ----- Import Modules -----
 const mongoose = require('mongoose')       // to connect with MongoDB
-const logger = require('morgan')           // aides in development by logging http request to console
+const morgan = require('morgan')           // aides in development by logging http request to console
 const cors = require('cors')               // will eanable cross-origin resource sharing
 // ----- Controllers -----
-const recipientController = require('./controllers/recipients')
+// const recipientController = require('./controllers/recipients')
+const transactionsController = require('./controllers/transactions')
 // ----- Google Firebase Authorization -----
+/* TODO: uncomment once firebase is implemented on frontend
 const admin = require('firebase-admin')
 const serviceAccount = require('./gifted-97cf7-firebase-adminsdk-in0qi-74d39a9f03.json')
+*/
 
 
 // =======================================
@@ -33,10 +36,11 @@ db.on('error', (error) => console.log(`MongoDB had an error of: ${error}`));
 // =======================================
 //          MIDDLEWARE
 // =======================================
-app.use(logger('dev'))          // mounts morgan to assist in development
+app.use(morgan('dev'))          // mounts morgan to assist in development
 app.use(cors());                // attaches an access-control-allow-origin header to the response to prevent the browser from blocking the response due to cross-origin resource sharing
 app.use(express.json());        // allows parsing of incoming json data to create req.body
 // ----- Authorization Middleware -----
+/* TODO: uncommment this code when firebase is complete on frontend
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
@@ -56,6 +60,7 @@ function isAuthenticated(req, res, next) {
     if (req.user) return next();
     else res.status(401).json({message: 'unauthorized'})
 }
+*/
 
 // =======================================
 //          ROUTES & CONTROLLERS
@@ -67,10 +72,15 @@ app.get('/api', (req, res) => {
 });
 
 // ----- TODO Add remaining controllers
+// TODO: add gift controller
+// TODO: add event controller
 
-// ----- RECIPIENT CONTROLLER -----
+// ----- TRANSACTION Controller -----
+app.use('/api/transactions', transactionsController)
+
+// ----- RECIPIENT Controller -----
 // mount the router middleware (isAuthenticated) as a gate to the routes in this controller
-app.use('/api/recipients', isAuthenticated, recipientController)
+// app.use('/api/recipients', isAuthenticated, recipientController)
 
 
 
