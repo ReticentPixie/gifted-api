@@ -2,16 +2,17 @@
 //      DEPENDENCIES & CONFIGURATIONS
 // =======================================
 // ----- Import .env & get variables -----
-require('dotenv').config();
-const { PORT = 3001, DATABASE_URL } = process.env;      // destructured for ease; uses port 3001 to avoid issues with frontend on Heroku
+require('dotenv').config()
+const { PORT = 3001, DATABASE_URL } = process.env      // destructured for ease; uses port 3001 to avoid issues with frontend on Heroku
 // ----- Import & Initialize Express -----
-const express = require('express');
-const app = express();
+const express = require('express')
+const app = express()
 // ----- Other Imports -----
-const mongoose = require('mongoose');       // to connect with MongoDB
-const logger = require('morgan');           // aides in development by logging http request to console
-const cors = require('cors');               // will eanable cross-origin resource sharing
-
+const mongoose = require('mongoose')       // to connect with MongoDB
+const logger = require('morgan')           // aides in development by logging http request to console
+const cors = require('cors')               // will eanable cross-origin resource sharing
+// ----- Controllers -----
+const recipientController = require('./controllers/recipients')
 
 // =======================================
 //              DATABASE
@@ -41,6 +42,13 @@ app.use(express.json());        // allows parsing of incoming json data to creat
 app.get('/api', (req, res) => {
     res.json('Welcome to the Gifted API');
 });
+
+// ----- TODO Add remaining controllers
+
+// ----- RECIPIENT CONTROLLER -----
+app.use('/api/recipients', recipientController)
+
+
 
 // ----- Catch All Route -----
 // allows catching of requests for routes that are not found
