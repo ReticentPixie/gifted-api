@@ -11,7 +11,7 @@ const router = express.Router();                    // create router object
 // ----- INDEX Route -----
 router.get('/', async (req, res) => {
     try {
-        res.json(await Recipient.find({}));
+        res.json(await Recipient.find({managedBy: req.user.uid}));
     } catch (error) {
         res.status(401).json({message: 'Please login'})
     }
