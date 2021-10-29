@@ -25,7 +25,12 @@ const transactionSchema = new Schema ({
     recipientId: {type: String, required: true},
     date: Date,
     managedBy: String,              // this is the uid from google firebase for authentication purposes
-    todos: [noteSchema]
+    notes: [noteSchema]
+    // TODO: fix the below to be able to add a default value
+    // notes: {
+    //     type: noteSchema,
+    //     default: []
+    // }
 }, { timestamps: true }
 )
 

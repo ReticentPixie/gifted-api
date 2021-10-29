@@ -4,12 +4,11 @@
 // ----- Import .env & get variables -----
 require('dotenv').config()
 const { 
-    PORT = 3001, 
+    PORT=3001, 
     DATABASE_URL, 
     PRIVATE_KEY_ID, 
     PRIVATE_KEY, 
-    CLIENT_ID,
-} = process.env      // destructured for ease; uses port 3001 to avoid issues with frontend on Heroku
+    CLIENT_ID, } = process.env      // destructured for ease; uses port 3001 to avoid issues with frontend on Heroku
 // ----- Import & Initialize Express -----
 const express = require('express')
 const app = express()
@@ -41,7 +40,7 @@ db.on('error', (error) => console.log(`MongoDB had an error of: ${error}`));
 // =======================================
 app.use(morgan('dev'))          // mounts morgan to assist in development
 app.use(cors());                // attaches an access-control-allow-origin header to the response to prevent the browser from blocking the response due to cross-origin resource sharing
-app.use(express.json());        // allows parsing of incoming json data to create req.body
+app.use(express.json());        // parse incoming json data to create req.body
 
 // ----- Authorization Middleware -----
 admin.initializeApp({
@@ -62,20 +61,19 @@ admin.initializeApp({
 
 app.use(async function(req, res, next) {
     const token = req.get('Authorization')
+    
     if(token) {         // check to see if a token (authorization headers) were sent with the request
-        // console.log(token)  // just to see if we've accessed it
         const authUser = await admin.auth().verifyIdToken(token.replace('Bearer ', ''))
-        // console.log(authUser)   // just to see what we get back
         req.user = authUser;
     }
-    // call next() to ensure the app continues to move to the next pieces of code
+    
     next();
 })
 
-// router auth middleware function - will test that authUser in req.User
+// custom router auth middleware - will test that authUser in req.User
 function isAuthenticated(req, res, next) {
     if (req.user) return next();
-    else res.status(401).json({message: 'unauthorized'})
+    else res.status(401).json({message: 'Unauthorized Access'})
 }
 
 
@@ -100,8 +98,7 @@ app.use('/api/transactions', isAuthenticated, transactionsController)
 // app.use('/api/recipients', isAuthenticated, recipientController)
 
 
-// ----- Catch All Route -----
-// allows catching of requests for routes that are not found
+// ----- Catch All Route - for routes not found -----
 app.get('/api/*', (req, res) => {
     res.status(404).json({message: 'That route was not found'})
 })
