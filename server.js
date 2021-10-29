@@ -3,7 +3,13 @@
 // =======================================
 // ----- Import .env & get variables -----
 require('dotenv').config()
-const { PORT = 3001, DATABASE_URL } = process.env      // destructured for ease; uses port 3001 to avoid issues with frontend on Heroku
+const { 
+    PORT = 3001, 
+    DATABASE_URL, 
+    PRIVATE_KEY_ID, 
+    PRIVATE_KEY, 
+    CLIENT_ID,
+} = process.env      // destructured for ease; uses port 3001 to avoid issues with frontend on Heroku
 // ----- Import & Initialize Express -----
 const express = require('express')
 const app = express()
@@ -15,10 +21,7 @@ const cors = require('cors')               // will eanable cross-origin resource
 // const recipientController = require('./controllers/recipients')
 const transactionsController = require('./controllers/transactions')
 // ----- Google Firebase Authorization -----
-/* TODO: uncomment once firebase is implemented on frontend
 const admin = require('firebase-admin')
-const serviceAccount = require('./gifted-97cf7-firebase-adminsdk-in0qi-74d39a9f03.json')
-*/
 
 
 // =======================================
@@ -39,18 +42,32 @@ db.on('error', (error) => console.log(`MongoDB had an error of: ${error}`));
 app.use(morgan('dev'))          // mounts morgan to assist in development
 app.use(cors());                // attaches an access-control-allow-origin header to the response to prevent the browser from blocking the response due to cross-origin resource sharing
 app.use(express.json());        // allows parsing of incoming json data to create req.body
+
 // ----- Authorization Middleware -----
-/* TODO: uncommment this code when firebase is complete on frontend
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+    credential: admin.credential.cert({
+        "type": "service_account",
+        "project_id": "gifted-97cf7",
+        "private_key_id": PRIVATE_KEY_ID,
+        // uses regex to write a regular expression to avoid heroku adding in extra / when parsing through the environment variable
+        "private_key": PRIVATE_KEY.replace(/\\n/g, '\n'),
+        "client_email": "firebase-adminsdk-in0qi@gifted-97cf7.iam.gserviceaccount.com",
+        "client_id": CLIENT_ID,
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-in0qi%40gifted-97cf7.iam.gserviceaccount.com"
+    })
 });
 
-app.use(async function(res, res, next) {
+app.use(async function(req, res, next) {
     const token = req.get('Authorization')
-    // console.log(token)  // just to see if we've accessed it
-    const authUser = await admin.auth().verifyIdToken(token.replace('Bearer ', ''))
-    // console.log(authUser)   // just to see what we get back
-    req.user = authUser;
+    if(token) {         // check to see if a token (authorization headers) were sent with the request
+        // console.log(token)  // just to see if we've accessed it
+        const authUser = await admin.auth().verifyIdToken(token.replace('Bearer ', ''))
+        // console.log(authUser)   // just to see what we get back
+        req.user = authUser;
+    }
     // call next() to ensure the app continues to move to the next pieces of code
     next();
 })
@@ -60,7 +77,7 @@ function isAuthenticated(req, res, next) {
     if (req.user) return next();
     else res.status(401).json({message: 'unauthorized'})
 }
-*/
+
 
 // =======================================
 //          ROUTES & CONTROLLERS
@@ -76,12 +93,11 @@ app.get('/api', (req, res) => {
 // TODO: add event controller
 
 // ----- TRANSACTION Controller -----
-app.use('/api/transactions', transactionsController)
+app.use('/api/transactions', isAuthenticated, transactionsController)
 
 // ----- RECIPIENT Controller -----
 // mount the router middleware (isAuthenticated) as a gate to the routes in this controller
 // app.use('/api/recipients', isAuthenticated, recipientController)
-
 
 
 // ----- Catch All Route -----
