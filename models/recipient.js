@@ -22,17 +22,11 @@ const noteSchema = new Schema ({
 // ---------- PRIMARY Recipient ----------
 const recipientSchema = new Schema ({
     name: String,
-    birthday: String,
+    birthday: Date,
     age: Number,
     gender: String,
-    likes: {
-        type: noteSchema,
-        default: []
-    },
-    dislikes: {
-        type: noteSchema,
-        default: []
-    },
+    likes: [noteSchema],
+    dislikes: [noteSchema],
     transactions: {type: Schema.Types.ObjectId, ref:`Transaction`},
     managedBy: String   // <= the google firebase user's uid number
 }, { timestamps: true }

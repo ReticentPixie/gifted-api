@@ -33,6 +33,7 @@ router.post('/', async (req, res) => {
     try {
         res.json(await Recipients.create(req.body))
     } catch (error) {
+        console.log(error)
         res.status(401).json({message: 'Please login'})
     }
 })
