@@ -12,12 +12,9 @@ const router = express.Router();                            // create router obj
 // ----- INDEX Route -----
 router.get('/', async (req, res) => {
     try {
-        // res.json(await Transactions.find({}).populate(`eventId`));
-        Transactions.find({}).populate('eventId').exec((err, foundTransactions) => {
-            res.json(foundTransactions) 
-        });
-
+        res.json(await Transactions.find({}).populate(`eventId`).populate('recipientId'));
     } catch (error) {
+        // console.log(error)
         res.status(401).json({message: 'Login required to continue'})
     }
 })
@@ -42,20 +39,6 @@ router.post('/', async (req, res) => {
         res.status(401).json({message: 'Login required to continue'})
     }
 })
-
-// EXAMPLE of how to do an embedded schema
-// this is a nested resource route
-router.post('/:id/notes', async (req, res) => {
-    try {
-       const transaction = await Transctions.findById(req.params.id);
-       transaction.notes.push(req.body);            // pushes the data into the notes array in memory only
-       await transaction.save();                    // saves the data to persist the changes in mongoDB
-       res.json(transaction);
-    } catch (error) {
-        res.status(401).json({message: 'Something went wrong.'})
-    }
-})
-
 
 // =======================================
 //         EXPORT ROUTER OBJECT
