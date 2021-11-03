@@ -11,14 +11,29 @@ const Schema = mongoose.Schema
 // =======================================
 //              DEFINE SCHEMA
 // =======================================
+
+// ---------- Embedded LIKES ----------
+const noteSchema = new Schema ({
+    content: String,
+    createdBy: String,              // our logged in user
+}, { timestamps: true });
+
+
+// ---------- PRIMARY Recipient ----------
 const recipientSchema = new Schema ({
     name: String,
     birthday: String,
     age: Number,
     gender: String,
-    // TODO: add embedded schema for likes: [likesSchema]
-    // TODO: add embedded schema for dislikes: [dislikesSchema]
-    // TODO: add transactions
+    likes: {
+        type: noteSchema,
+        default: []
+    },
+    dislikes: {
+        type: noteSchema,
+        default: []
+    },
+    transactions: {type: Schema.Types.ObjectId, ref:`Transaction`},
     managedBy: String   // <= the google firebase user's uid number
 }, { timestamps: true }
 )

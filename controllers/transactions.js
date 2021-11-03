@@ -2,7 +2,6 @@
 //              DEPENDENCIES
 // =======================================
 const express = require('express');
-const transaction = require('../models/transaction');
 const Transactions = require('../models/transaction')       // require relevant model
 const router = express.Router();                            // create router object
 
@@ -13,18 +12,31 @@ const router = express.Router();                            // create router obj
 // ----- INDEX Route -----
 router.get('/', async (req, res) => {
     try {
-        res.json(await Transactions.find({}));
+        // res.json(await Transactions.find({}).populate(`eventId`));
+        Transactions.find({}).populate('eventId').exec((err, foundTransactions) => {
+            res.json(foundTransactions) 
+        });
+
     } catch (error) {
         res.status(401).json({message: 'Login required to continue'})
     }
 })
 
-// TODO ----- DELETE Route -----
+// ----- DELETE Route -----
+router.delete('/:id', async (req, res) => {
+    try {
+        res.json(await Transactions.findByIdAndDelete(req.params.id))
+    } catch (error) {
+        res.status(400).json(error)
+    }
+})
+
 // TODO ----- UPDATE ROUTE -----
 
 // ----- Create Route -----
 router.post('/', async (req, res) => {
     try {
+        console.log(req.body)
         res.json(await Transactions.create(req.body))
     } catch (error) {
         res.status(401).json({message: 'Login required to continue'})

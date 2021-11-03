@@ -17,8 +17,9 @@ const mongoose = require('mongoose')       // to connect with MongoDB
 const morgan = require('morgan')           // aides in development by logging http request to console
 const cors = require('cors')               // will eanable cross-origin resource sharing
 // ----- Controllers -----
-// const recipientController = require('./controllers/recipients')
 const transactionsController = require('./controllers/transactions')
+const eventsController = require('./controllers/events')
+const recipientsController = require('./controllers/recipients')
 // ----- Google Firebase Authorization -----
 const admin = require('firebase-admin')
 
@@ -80,23 +81,23 @@ function isAuthenticated(req, res, next) {
 // =======================================
 //          ROUTES & CONTROLLERS
 // =======================================
+// Note - router middleware (isAuthenticated) serves as a gate to the routes in all protected routes
 
 // ----- TEST Route -----
 app.get('/api', (req, res) => {
     res.json('Welcome to the Gifted API');
 });
 
-// ----- TODO Add remaining controllers
-// TODO: add gift controller
-// TODO: add event controller
-
 // ----- TRANSACTION Controller -----
 app.use('/api/transactions', isAuthenticated, transactionsController)
 
-// ----- RECIPIENT Controller -----
-// mount the router middleware (isAuthenticated) as a gate to the routes in this controller
-// app.use('/api/recipients', isAuthenticated, recipientController)
+// ----- GIFT Controller -----
+app.use('/api/events', isAuthenticated, eventsController)
 
+// ----- RECIPIENT Controller -----
+app.use('/api/recipients', isAuthenticated, recipientsController)
+
+// TODO: add gift controller
 
 // ----- Catch All Route - for routes not found -----
 app.get('/api/*', (req, res) => {
