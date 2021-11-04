@@ -1,26 +1,27 @@
 // =======================================
 //              DEPENDENCIES
 // =======================================
-const express = require('express');
-const Transactions = require('../models/transaction')       // require relevant model
+const express = require(`express`);
+const Transactions = require(`../models/transaction`)       // require relevant model
 const router = express.Router();                            // create router object
+
 
 // =======================================
 //              ROUTES
 //          Follow INDUCES
 // =======================================
 // ----- INDEX Route -----
-router.get('/', async (req, res) => {
+router.get(`/`, async (req, res) => {
     try {
-        res.json(await Transactions.find({}).populate(`eventId`).populate('recipientId'));
+        res.json(await Transactions.find({}).populate(`eventId`).populate(`recipientId`));
     } catch (error) {
         // console.log(error)
-        res.status(401).json({message: 'Login required to continue'})
+        res.status(401).json({message: `Login required to continue`})
     }
 })
 
 // ----- DELETE Route -----
-router.delete('/:id', async (req, res) => {
+router.delete(`/:id`, async (req, res) => {
     try {
         res.json(await Transactions.findByIdAndDelete(req.params.id))
     } catch (error) {
@@ -28,17 +29,19 @@ router.delete('/:id', async (req, res) => {
     }
 })
 
-// TODO ----- UPDATE ROUTE -----
+// TODO - build update route to allow edits to transactions
+// ----- UPDATE ROUTE -----
 
 // ----- Create Route -----
-router.post('/', async (req, res) => {
+router.post(`/`, async (req, res) => {
     try {
         console.log(req.body)
         res.json(await Transactions.create(req.body))
     } catch (error) {
-        res.status(401).json({message: 'Login required to continue'})
+        res.status(401).json({message: `Login required to continue`})
     }
 })
+
 
 // =======================================
 //         EXPORT ROUTER OBJECT

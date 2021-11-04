@@ -2,26 +2,26 @@
 //      DEPENDENCIES & CONFIGURATIONS
 // =======================================
 // ----- Import .env & get variables -----
-require('dotenv').config()
+require(`dotenv`).config()
 const { 
     PORT=3001, 
     DATABASE_URL, 
     PRIVATE_KEY_ID, 
     PRIVATE_KEY, 
-    CLIENT_ID, } = process.env      // destructured for ease; uses port 3001 to avoid issues with frontend on Heroku
+    CLIENT_ID, } = process.env              // destructured for ease; utilizes port 3001 to avoid issues with frontend deployed via Heroku
 // ----- Import & Initialize Express -----
-const express = require('express')
+const express = require(`express`)
 const app = express()
 // ----- Import Modules -----
-const mongoose = require('mongoose')       // to connect with MongoDB
-const morgan = require('morgan')           // aides in development by logging http request to console
-const cors = require('cors')               // will eanable cross-origin resource sharing
+const mongoose = require(`mongoose`)       // to connect with MongoDB
+const morgan = require(`morgan`)           // aides in development by logging http request to console
+const cors = require(`cors`)               // will enable cross-origin resource sharing
 // ----- Controllers -----
-const transactionsController = require('./controllers/transactions')
-const eventsController = require('./controllers/events')
-const recipientsController = require('./controllers/recipients')
+const transactionsController = require(`./controllers/transactions`)
+const eventsController = require(`./controllers/events`)
+const recipientsController = require(`./controllers/recipients`)
 // ----- Google Firebase Authorization -----
-const admin = require('firebase-admin')
+const admin = require(`firebase-admin`)
 
 
 // =======================================
@@ -31,17 +31,17 @@ const admin = require('firebase-admin')
 mongoose.connect(DATABASE_URL);
 const db = mongoose.connection;
 // ----- Connection Events & Listeners -----
-db.on('connected', () => console.log(`MongoDB is connected to the ${db.name} on port ${db.port}`));
-db.on('disconnected', () => console.log('Disconnected from MongoDB'));
-db.on('error', (error) => console.log(`MongoDB had an error of: ${error}`));
+db.on(`connected`, () => console.log(`MongoDB is connected to the ${db.name} on port ${db.port}`));
+db.on(`disconnected`, () => console.log(`Disconnected from MongoDB`));
+db.on(`error`, (error) => console.log(`MongoDB had an error of: ${error}`));
 
 
 // =======================================
 //          MIDDLEWARE
 // =======================================
-app.use(morgan('dev'))          // mounts morgan to assist in development
-app.use(cors());                // attaches an access-control-allow-origin header to the response to prevent the browser from blocking the response due to cross-origin resource sharing
-app.use(express.json());        // parse incoming json data to create req.body
+app.use(morgan(`dev`))                  // mounts morgan to assist in development
+app.use(cors());                        // attaches an access-control-allow-origin header to the response to prevent the browser from blocking the response due to cross-origin resource sharing
+app.use(express.json());                // parse incoming json data to create req.body
 
 // ----- Authorization Middleware -----
 admin.initializeApp({
@@ -61,47 +61,34 @@ admin.initializeApp({
 });
 
 app.use(async function(req, res, next) {
-    const token = req.get('Authorization')
-    
-    if(token) {         // check to see if a token (authorization headers) were sent with the request
-        const authUser = await admin.auth().verifyIdToken(token.replace('Bearer ', ''))
+    const token = req.get(`Authorization`)
+    if(token) {                         // check to see if a token (authorization headers) were sent with the request
+        const authUser = await admin.auth().verifyIdToken(token.replace(`Bearer `, ``))
         req.user = authUser;
     }
-    
     next();
 })
 
-// custom router auth middleware - will test that authUser in req.User
+// custom router auth middleware - tests that authUser is in req.User
 function isAuthenticated(req, res, next) {
     if (req.user) return next();
-    else res.status(401).json({message: 'Unauthorized Access'})
+    else res.status(401).json({message: `Unauthorized Access`})
 }
 
 
 // =======================================
 //          ROUTES & CONTROLLERS
 // =======================================
-// Note - router middleware (isAuthenticated) serves as a gate to the routes in all protected routes
-
-// ----- TEST Route -----
-app.get('/api', (req, res) => {
-    res.json('Welcome to the Gifted API');
-});
-
-// ----- TRANSACTION Controller -----
-app.use('/api/transactions', isAuthenticated, transactionsController)
-
-// ----- GIFT Controller -----
-app.use('/api/events', isAuthenticated, eventsController)
-
-// ----- RECIPIENT Controller -----
-app.use('/api/recipients', isAuthenticated, recipientsController)
-
+// Note - router middleware (isAuthenticated) serves as a gate to all protected routes
 // TODO: add gift controller
-
-// ----- Catch All Route - for routes not found -----
-app.get('/api/*', (req, res) => {
-    res.status(404).json({message: 'That route was not found'})
+app.get(`/api`, (req, res) => {                                                 // ----- TEST Route -----
+    res.json(`Welcome to the Gifted API`);
+});
+app.use(`/api/transactions`, isAuthenticated, transactionsController)           // ----- Transactions Controller -----
+app.use(`/api/events`, isAuthenticated, eventsController)                       // ----- Events Controller -----
+app.use(`/api/recipients`, isAuthenticated, recipientsController)               // ----- Recipients Controller -----
+app.get(`/api/*`, (req, res) => {                                               // ----- Catch All Route - for routes not found -----
+    res.status(404).json({message: `That route was not found`})
 })
 
 

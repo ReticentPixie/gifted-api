@@ -1,12 +1,14 @@
 // =======================================
 //              DEPENDENCIES
 // =======================================
-const mongoose = require('mongoose')
+const mongoose = require(`mongoose`)
+
 
 // =======================================
 //              SHORTCUT VARIABLE
 // =======================================
 const Schema = mongoose.Schema
+
 
 // =======================================
 //              DEFINE SCHEMA
@@ -16,11 +18,12 @@ const transactionSchema = new Schema ({
     giftId: {type: String, required: true},
     recipientId: {type: Schema.Types.ObjectId, ref:`Recipient`, required: true},
     date: Date,
-    managedBy: String,              // this is the uid from google firebase for authentication purposes
+    managedBy: String,          // this is the google firebase user uid
 }, { timestamps: true }
 )
+
 
 // =======================================
 //          CONVERT & EXPORT MODEL
 // =======================================
-module.exports = mongoose.model('Transaction', transactionSchema)
+module.exports = mongoose.model(`Transaction`, transactionSchema)

@@ -1,12 +1,14 @@
 // =======================================
 //              DEPENDENCIES
 // =======================================
-const mongoose = require('mongoose')
+const mongoose = require(`mongoose`)
+
 
 // =======================================
 //              SHORTCUT VARIABLE
 // =======================================
 const Schema = mongoose.Schema
+
 
 // =======================================
 //              DEFINE SCHEMA
@@ -28,11 +30,12 @@ const recipientSchema = new Schema ({
     likes: [noteSchema],
     dislikes: [noteSchema],
     transactions: {type: Schema.Types.ObjectId, ref:`Transaction`},
-    managedBy: String   // <= the google firebase user's uid number
+    managedBy: String           // this is the google firebase user uid
 }, { timestamps: true }
 )
+
 
 // =======================================
 //          CONVERT & EXPORT MODEL
 // =======================================
-module.exports = mongoose.model('Recipient', recipientSchema)
+module.exports = mongoose.model(`Recipient`, recipientSchema)
